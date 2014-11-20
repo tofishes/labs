@@ -116,23 +116,32 @@
     <div id="show"></div>
 
     <script src="../libs/js/jquery-2.1.1.min.js"></script>
+    <script src="../libs/js/gyro.min.js"></script>
     <script>
     var $show = $('#show')
     ,   $box = $('.box');
 
-    function handleMotionEvent(event) {
+    function handleMotionEvent(o) {
 
-        var x = event.accelerationIncludingGravity.x;
-        var y = event.accelerationIncludingGravity.y;
-        var z = event.accelerationIncludingGravity.z;
+        // var x = o.accelerationIncludingGravity.x;
+        // var y = o.accelerationIncludingGravity.y;
+        // var z = o.accelerationIncludingGravity.z;
+        var x, y, z;
+
+        x = o.x;
+        y = o.y;
+        z = o.z;
+
+        // x = o.gamma;
+        // y = o.alpha;
+        // z = o.beta;
 
         $show.html('x: ' + fixed(x) + '(' + x + ')<br>' + 'y: ' + fixed(y) + '(' + y + ')<br>' + 'z: ' + fixed(z) + '(' + z + ')');
 
         var rotateStr = 'translate3d(0, 0, 500px) rotateZ({2}deg) rotateX(-90deg) rotateX({0}deg) rotateY({1}deg) rotateY(0deg)';
-        var rotateEnd = rotateStr.replace('{1}', event.x * -1).replace('{0}', event.y).replace('{2}', (event.z % 3600000) * -1);
-        $box.css({
-            '-webkit-transform': rotateEnd
-        })
+        var rotateEnd = rotateStr.replace('{1}', x * -1).replace('{0}', y).replace('{2}', (z % 3600000) * -1);
+
+        $box[0].style.webkitTransform = rotateEnd;
     }
 
     function fixed(number, precision) {
@@ -140,7 +149,12 @@
         return Number(number).toFixed(precision);
     }
 
-    window.addEventListener("devicemotion", handleMotionEvent, true);
+    gyro.startTracking(function(o) {
+        // o.x, o.y, o.z for accelerometer
+        // o.alpha, o.beta, o.gamma for gyro
+        handleMotionEvent(o);
+    });
+    // window.addEventListener("devicemotion", handleMotionEvent, true);
     </script>
 </body>
 
