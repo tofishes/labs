@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>test devicemotion</title>
+</head>
+<body>
+    <h2>测试陀螺仪，重力</h2>
+
+    <script src="../libs/js/jquery-2.1.1.min.js"></script>
+    <script>
+    function handleMotionEvent(event) {
+
+        var x = event.accelerationIncludingGravity.x;
+        var y = event.accelerationIncludingGravity.y;
+        var z = event.accelerationIncludingGravity.z;
+
+        // Do something awesome.
+    }
+
+    window.addEventListener("devicemotion", handleMotionEvent, true);
+    </script>
+</body>
+</html>
