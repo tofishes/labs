@@ -117,7 +117,8 @@
 
     <script src="../libs/js/jquery-2.1.1.min.js"></script>
     <script>
-    var $show = $('#show');
+    var $show = $('#show')
+    ,   $box = $('.box');
 
     function handleMotionEvent(event) {
 
@@ -125,8 +126,13 @@
         var y = event.accelerationIncludingGravity.y;
         var z = event.accelerationIncludingGravity.z;
 
-        $show.html('x: ' + fixed(x) + '(' + x + ')<br>' + 'y: ' + fixed(y) + '(' + y + ')<br>' + 'z: ' + fixed(z) + '(' + z + ')')
-            .append('<p>' + JSON.stringify(event.rotationRate));
+        $show.html('x: ' + fixed(x) + '(' + x + ')<br>' + 'y: ' + fixed(y) + '(' + y + ')<br>' + 'z: ' + fixed(z) + '(' + z + ')');
+
+        var rotateStr = 'translate3d(0, 0, 500px) rotateZ({2}deg) rotateX(-90deg) rotateX({0}deg) rotateY({1}deg) rotateY(0deg)';
+        var rotateEnd = rotateStr.replace('{1}', e.x * -1).replace('{0}', e.y).replace('{2}', (e.z % 3600000) * -1);
+        $box.css({
+            '-webkit-transform': rotateEnd
+        })
     }
 
     function fixed(number, precision) {
