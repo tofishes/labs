@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>test devicemotion</title>
@@ -10,17 +11,114 @@
 
     <link rel="stylesheet" href="../libs/css/normalize.css">
     <style>
-    body { font-size: 16px; }
+    body {
+        font-size: 16px;
+    }
+    #bg {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        -webkit-transform: translate3d(0px, 0px, 0px);
+        z-index: 1;
+    }
+    .wrap {
+        position: absolute;
+        -webkit-transform-style: preserve-3d;
+        -webkit-perspective: 1000px;
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+    }
+    .box {
+        position: absolute;
+        -webkit-transform-style: preserve-3d;
+        width: 512px;
+        height: 512px;
+        top: 50%;
+        left: 50%;
+        margin: -256px 0 0 -256px;
+    }
+    .face {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        -webkit-transform-origin: 50% 50% 0;
+        -webkit-backface-visibility: hidden;
+        background-size: 512px;
+        background-repeat: no-repeat;
+        z-index: 1;
+    }
+    .nf {
+        background-image: url(../css/n.jpg);
+        -webkit-transform: rotateX(0deg) rotateY(0deg) translateZ(-255px);
+    }
+    .ef {
+        background-image: url(../css/e.jpg);
+        -webkit-transform: rotateX(0deg) rotateY(-90deg) translateZ(-255px);
+    }
+    .sf {
+        background-image: url(../css/s.jpg);
+        -webkit-transform: rotateX(0deg) rotateY(180deg) translateZ(-255px);
+    }
+    .wf {
+        background-image: url(../css/w.jpg);
+        -webkit-transform: rotateX(0deg) rotateY(90deg) translateZ(-255px);
+    }
+    .uf {
+        background-image: url(../css/u.jpg);
+        -webkit-transform: rotateX(-90deg) rotateY(0deg) translateZ(-255px);
+    }
+    .df {
+        background-image: url(../css/d.jpg);
+        -webkit-transform: rotateX(90deg) rotateY(0deg) translateZ(-255px);
+    }
     </style>
 </head>
+
 <body>
     <h2>测试陀螺仪，重力</h2>
+
+    <div id="bg">
+        <div class="wrap">
+            <div class="box">
+                <!--North face-->
+                <div id="north" class="face nf">
+                    <a class="btn-open btn-weixin" href="#" data-class="weixin"></a>
+                    <a class="btn-open btn-qq" href="#" data-class="qq"></a>
+                    <a class="btn-open btn-qzone" href="#" data-class="qzone"></a>
+                    <a class="btn-open btn-intro" href="#" data-class="intro"></a>
+                    <a class="btn-open btn-duty" href="#" data-class="duty"></a>
+                    <a class="btn-open btn-connect" href="#" data-class="connect"></a>
+                    <a class="btn-open btn-course" href="#" data-class="course"></a>
+                </div>
+                <!--East face-->
+                <div id="east" class="face ef">
+                    <a class="btn-open btn-tool" href="#" data-class="tool"></a>
+                    <a class="btn-open btn-message" href="#" data-class="message"></a>
+                </div>
+                <!--South face-->
+                <div id="south" class="face sf"></div>
+                <!--West face-->
+                <div id="west" class="face wf">
+                    <a class="btn-open btn-cht" href="#" data-class="cht"></a>
+                    <a class="btn-open btn-huyu" href="#" data-class="huyu"></a>
+                </div>
+                <!--Up face-->
+                <div id="up" class="face uf"></div>
+                <!--Down face-->
+                <div id="down" class="face df">
+                </div>
+
+            </div>
+        </div>
+    </div>
 
     <div id="show"></div>
 
     <script src="../libs/js/jquery-2.1.1.min.js"></script>
     <script>
     var $show = $('#show');
+
     function handleMotionEvent(event) {
 
         var x = event.accelerationIncludingGravity.x;
@@ -39,4 +137,5 @@
     window.addEventListener("devicemotion", handleMotionEvent, true);
     </script>
 </body>
+
 </html>
