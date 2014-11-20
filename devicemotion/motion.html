@@ -27,7 +27,8 @@
         var y = event.accelerationIncludingGravity.y;
         var z = event.accelerationIncludingGravity.z;
 
-        $show.html('x: ' + fixed(x) + '(' + x + ')<br>' + 'y: ' + fixed(y) + '(' + y + ')<br>' + 'z: ' + fixed(z) + '(' + z + ')');
+        $show.html('x: ' + fixed(x) + '(' + x + ')<br>' + 'y: ' + fixed(y) + '(' + y + ')<br>' + 'z: ' + fixed(z) + '(' + z + ')')
+            .append('<p>' + JSON.stringify(event.rotationRate));
     }
 
     function fixed(number, precision) {
