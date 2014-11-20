@@ -7,8 +7,11 @@
 <body>
     <h2>测试陀螺仪，重力</h2>
 
+    <div id="show"></div>
+
     <script src="../libs/js/jquery-2.1.1.min.js"></script>
     <script>
+    var $show = $('#show');
     function handleMotionEvent(event) {
 
         var x = event.accelerationIncludingGravity.x;
@@ -16,6 +19,7 @@
         var z = event.accelerationIncludingGravity.z;
 
         // Do something awesome.
+        $show.html('x: ' + x + '<br>' + 'y: ' + y + '<br>' + 'z: ' + z);
     }
 
     window.addEventListener("devicemotion", handleMotionEvent, true);
