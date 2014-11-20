@@ -129,7 +129,7 @@
         $show.html('x: ' + fixed(x) + '(' + x + ')<br>' + 'y: ' + fixed(y) + '(' + y + ')<br>' + 'z: ' + fixed(z) + '(' + z + ')');
 
         var rotateStr = 'translate3d(0, 0, 500px) rotateZ({2}deg) rotateX(-90deg) rotateX({0}deg) rotateY({1}deg) rotateY(0deg)';
-        var rotateEnd = rotateStr.replace('{1}', e.x * -1).replace('{0}', e.y).replace('{2}', (e.z % 3600000) * -1);
+        var rotateEnd = rotateStr.replace('{1}', event.x * -1).replace('{0}', event.y).replace('{2}', (event.z % 3600000) * -1);
         $box.css({
             '-webkit-transform': rotateEnd
         })
