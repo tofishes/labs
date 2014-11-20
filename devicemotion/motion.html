@@ -119,7 +119,13 @@
     <script src="../libs/js/gyro.min.js"></script>
     <script>
     var $show = $('#show')
-    ,   $box = $('.box');
+    ,   $box = $('.box')
+
+    ,   canUpdate = true;
+
+    setInterval(function () {
+        canUpdate = true;
+    }, 200);
 
     function handleMotionEvent(o) {
 
@@ -152,7 +158,11 @@
     gyro.startTracking(function(o) {
         // o.x, o.y, o.z for accelerometer
         // o.alpha, o.beta, o.gamma for gyro
-        handleMotionEvent(o);
+        if (canUpdate) {
+            handleMotionEvent(o);
+            canUpdate = false;
+        }
+
     });
     // window.addEventListener("devicemotion", handleMotionEvent, true);
     </script>
