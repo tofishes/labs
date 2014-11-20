@@ -28,7 +28,12 @@
         var z = event.accelerationIncludingGravity.z;
 
         // Do something awesome.
-        $show.html('x: ' + x + '<br>' + 'y: ' + y + '<br>' + 'z: ' + z);
+        $show.html('x: ' fixed(x) + '(' + x + ')<br>' + 'y: ' fixed(y) + '(' + y + ')<br>' + 'z: ' fixed(z) + '(' + z + ')');
+    }
+
+    function fixed(number, precision) {
+        precision = precision || 0;
+        return Number(number).toFixed(precision);
     }
 
     window.addEventListener("devicemotion", handleMotionEvent, true);
