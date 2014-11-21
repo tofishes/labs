@@ -138,9 +138,9 @@
         // y = o.y;
         // z = o.z;
 
-        x = o.beta;
-        y = o.alpha;
-        z = o.gamma;
+        x = fixed(o.beta, 2);
+        y = fixed(o.alpha, 2);
+        z = fixed(o.gamma, 2);
 
         // $show.html('x: ' + fixed(x) + '(' + x + ')<br>' + 'y: ' + fixed(y) + '(' + y + ')<br>' + 'z: ' + fixed(z) + '(' + z + ')');
 
