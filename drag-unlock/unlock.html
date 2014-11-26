@@ -14,58 +14,74 @@
         background: #e6e6e6;
         font-size: 10px;
     }
+    .wrap {
+        margin: 0 auto;
+        max-width: 640px;
+    }
     #wrap {
         position: relative;
-        margin: 0 2rem;
+        margin: 0 2.5rem;
     }
     #packet a {
         position: absolute;
-        top: 2rem;
+        top: 3rem;
     }
 
     .packet {
         display: inline-block;
-        width: 5rem;
-        height: 4rem;
+        width: 2rem;
+        height: 3rem;
         border: 1px solid red;
         text-align: center;
-        line-height: 4rem;
+        line-height: 3rem;
     }
 
     #lock {
-        margin: 20rem 0 0;
+        margin: 0 -2.5rem;
+        padding: 10rem 0 0;
     }
     #lock span {
         display: inline-block;
-        margin: 0 2rem;
-        width: 10rem;
-        height: 10rem;
-        line-height: 10rem;
+        margin: 0 1.2rem;
+        width: 4rem;
+        height: 4rem;
+        line-height: 4rem;
         text-align: center;
-        border-radius: 5rem;
+        border-radius: 2rem;
         box-shadow: 0 0 0.3rem red;
+        vertical-align: middle;
     }
     #lock > .active {
-        box-shadow: 0 0 0.3rem green;
+        box-shadow: 0 0 1rem green;
     }
     #lock span .correct {
         margin-left: 0!important;
     }
+
+    #status {
+        text-align: center;
+        font-size: .8rem;
+        color: #f69;
+    }
     </style>
 </head>
 <body>
-    <div id="wrap">
-        <div id="packet">
-            <a data-id="1">红包</a>
-            <a data-id="1">红包</a>
-            <a data-id="1">红包</a>
+    <div class="wrap">
+        <div id="wrap">
+            <div id="packet">
+                <a data-id="1">红包</a>
+                <a data-id="1">红包</a>
+                <a data-id="1">红包</a>
+            </div>
+
+            <div id="lock">
+                <span data-id="1"></span>
+                <span data-id="2"></span>
+                <span data-id="3"></span>
+            </div>
         </div>
 
-        <div id="lock">
-            <span data-id="1"></span>
-            <span data-id="2"></span>
-            <span data-id="3"></span>
-        </div>
+        <p id="status">拖动红包到正确的篮子中解锁</p>
     </div>
 
     <script src="../libs/js/jquery-2.1.1.min.js"></script>
@@ -75,8 +91,10 @@
         ,   word = '红包'
 
         ,   active = 'active'
+        ,   packet_item_class = '.packet'
 
         ,   $locks = $('#lock span')
+        ,   $status = $('#status')
 
         ,   packet_width = packet_height = 50;
 
@@ -132,9 +150,9 @@
 
         $packet.html(generate());
 
-        $packet.on('touchstart mousedown', 'a', function (e) {
+        $packet.on('touchstart mousedown', packet_item_class, function (e) {
             var $this = $(this)
-            ,   touch = e.touches ? e.touches[0] : e
+            ,   touch = e.originalEvent ? e.originalEvent.touches[0] : e
             ,   startX = touch.pageX
             ,   startY = touch.pageY
 
@@ -147,8 +165,9 @@
                 'left': left,
                 'top': top
             }).addClass(active);
+
             e.preventDefault();
-        }).on('touchmove mousemove', 'a', function (e) {
+        }).on('touchmove mousemove', packet_item_class, function (e) {
             e.preventDefault();
 
             var $this = $(this)
@@ -156,7 +175,7 @@
 
             if (!$this.hasClass(active) || !start) return;
 
-            var touch = e.touches ? e.touches[0] : e
+            var touch = e.originalEvent ? e.originalEvent.touches[0] : e
 
             ,   x = touch.pageX - start.x
             ,   y = touch.pageY - start.y;
@@ -177,10 +196,14 @@
 
                 $this.removeData('start').removeClass(active).addClass('correct');
                 $lock.addClass(active).append($this);
-            })
+
+                if (!$packet.find(packet_item_class).length) {
+                    $status.html('解锁成功！')
+                }
+            });
         })
         $(document).on('touchend mouseup', function (e) {
-            $packet.find('a').removeData('start').removeClass(active);
+            $packet.find(packet_item_class).removeData('start').removeClass(active);
         });
 
         // $lock.on('touchmove mousemove', 'span', function () {
