@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>拖动到指定框里回调</title>
+    <meta content="width=device-width,initial-scale=1, maximum-scale=1, minimum-scale=1,user-scalable=no, minimal-ui" name="viewport" />
+    <meta content="yes" name="apple-mobile-web-app-capable" />
+    <meta content="black" name="apple-mobile-web-app-status-bar-style" />
+    <meta content="telephone=no" name="format-detection" />
+
+    <link rel="stylesheet" href="../libs/css/normalize.css">
+    <style>
+    body {
+        background: #e6e6e6;
+        font-size: 10px;
+    }
+    .wrap {
+        margin: 0 auto;
+        max-width: 640px;
+    }
+    #wrap {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 2rem;
+        left: 0;
+    }
+    #packet a {
+        position: absolute;
+        z-index: 2;
+        cursor: move;
+    }
+
+    .packet {
+        width: 2rem;
+        height: 3rem;
+        border: 1px solid red;
+        text-align: center;
+        line-height: 3rem;
+    }
+
+    #lock {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin: -4rem 0 0 -4rem;
+        width: 8rem;
+        height: 8rem;
+        border-radius: 4rem;
+        box-shadow: 0 0 10px green;
+    }
+    #lock a {
+        position: absolute;
+        top: auto !important;
+        left: 1rem !important;
+        bottom: 10px;
+    }
+    #lock a.correct0 {
+        top: 0 !important;
+        left: 50% !important;
+        margin-left: -1rem !important;
+    }
+    #lock a.correct2 {
+        bottom: 10px;
+        left: auto !important;
+        right: 1rem;
+    }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <p id="status">拖动红包到篮子中解锁</p>
+        <div id="wrap">
+            <div id="packet">
+                <a data-id="1">红包</a>
+                <a data-id="1">红包</a>
+                <a data-id="1">红包</a>
+            </div>
+
+            <div id="lock"></div>
+        </div>
+
+    </div>
+
+    <script src="../libs/js/jquery-2.1.1.min.js"></script>
+    <script>
+    $.fn.dragIn = function (opts) {
+        opts = $.extend({
+            'item': '.packet',
+            'onIn': function ($item) {}
+        }, opts);
+
+        var data = [1, 2, 3]
+        ,   word = '红包'
+
+        ,   active = 'active'
+        ,   packet_item_class = opts.item
+
+        ,   $locks = this
+        ,   $status = $('#status')
+
+        ,   packet_width = packet_height = 50;
+
+        function generate() {
+            var packets = ''
+            ,   _data = data.sort(function () {
+                return Math.random() - 0.5;
+            })
+            ,   i = 0
+            ,   l = data.length
+
+            ,   style;
+
+            for (; i < l; i++) {
+                style = 'left: ' +  packet_width * i + '%; margin-left: -' + packet_width / 2 * i + 'px'
+
+                packets += '<a class="packet" style="' + style + '" data-id="' + _data[i] + '">' + word + '</a>'
+            }
+
+            return packets;
+        };
+        $locks.each(function () {
+            var $this = $(this)
+            ,   offset = $this.offset()
+
+            $this.data('edge', {
+                'x': offset.left,
+                'y': offset.top,
+                'w': $this.width(),
+                'h': $this.height()
+            });
+
+        });
+        // 如果两个矩形横向坐标相减的绝对值，小于两个矩形各自宽度一半相加的和，
+        // 同时两个矩形纵向坐标相减的绝对值，小于两个矩形各自高度一半相加的和，
+        // 那就说明这两个矩形碰撞了。
+        function reach($move, $target) {
+            var _offset = $move.offset()
+            ,   _x = _offset.left
+            ,   _y = _offset.top
+            ,   _w = _h = packet_width
+
+            ,   edge = $target.data('edge')
+
+            ,   xx = Math.abs(_x - edge.x)
+            ,   yy = Math.abs(_y - edge.y)
+            ,   ww = (_w + edge.w) / 2
+            ,   hh = (_h + edge.h) / 2;
+
+            return xx < ww && yy < hh;
+        }
+
+        var $packet = $('#packet');
+
+        $packet.html(generate());
+        // $locks.html(generate());
+
+        $packet.on('touchstart mousedown', packet_item_class, function (e) {
+            var $this = $(this)
+            ,   touch = e.originalEvent.touches ? e.originalEvent.touches[0] : e
+            ,   startX = touch.pageX
+            ,   startY = touch.pageY
+
+            ,   top = parseInt($this.css('top')) || 0
+            ,   left = parseInt($this.css('left')) || 0;
+
+            $this.data('start', {
+                'x': startX,
+                'y': startY,
+                'left': left,
+                'top': top
+            }).addClass(active);
+
+            e.preventDefault();
+        }).on('touchmove mousemove', packet_item_class, function (e) {
+            e.preventDefault();
+
+            var $this = $(this)
+            ,   start = $this.data('start')
+
+            if (!$this.hasClass(active) || !start) return;
+
+            var touch = e.originalEvent.touches ? e.originalEvent.touches[0] : e
+
+            ,   x = touch.pageX - start.x
+            ,   y = touch.pageY - start.y;
+
+            $this.css({
+                'top': start.top + y,
+                'left': start.left + x
+            });
+
+            // 检测是否进入某个框中
+            $locks.each(function () {
+                var $lock = $(this);
+
+                if (!reach($this, $lock)) return;
+
+                $this.removeData('start').removeClass(active).addClass('correct' + $lock.children().length);
+                $lock.addClass(active).append($this);
+
+                opts.onIn.call($lock, $this);
+
+                if (!$packet.find(packet_item_class).length) {
+                    $status.html('解锁成功！')
+                }
+            });
+        })
+        $(document).on('touchend mouseup', function (e) {
+            var $active = $packet.find('.' + active)
+            ,   start = $active.data('start');
+
+            if (!$active.length) return;
+
+            $active.removeData('start').removeClass(active);
+            // 回归原位
+            $active.animate({
+                'top': start.top,
+                'left': start.left
+            }, 300);
+        });
+    }
+
+    $(function () {
+        $('#lock').dragIn({
+            onIn: function ($item) {
+                alert('成功拖进' + $item.data('id') + '号红包！')
+            }
+        })
+    });
+    </script>
+</body>
+</html>
