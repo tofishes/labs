@@ -39,7 +39,7 @@
         border-radius: 5rem;
         box-shadow: 0 0 0.3rem red;
     }
-    #lock .active {
+    #lock > .active {
         box-shadow: 0 0 0.3rem green;
     }
     </style>
@@ -91,31 +91,64 @@
             ,   touch = e.touches ? e.touches[0] : e
             ,   startX = touch.pageX
             ,   startY = touch.pageY;
-console.info(e)
+
             $this.data('start', {
                 'x': startX,
                 'y': startY
-            });
+            }).addClass('active');
             e.preventDefault();
         }).on('touchmove mousemove', 'a', function (e) {
             e.preventDefault();
 
             var $this = $(this)
             ,   start = $this.data('start')
-            ,   touch = e.touches ? e.touches[0] : e
-
-            ,   x = touch.pageX
-            ,   y = touch.pageY;
 
             if (!start) return;
 
+            var touch = e.touches ? e.touches[0] : e
+
+            ,   x = touch.pageX - start.x
+            ,   y = touch.pageY - start.y
+
+            ,   top = $this.css('top')
+            ,   left = $this.css('left');
+
+            var translate = 'translate(' + x + 'px, ' + y + 'px)';
             $this.css({
-                'top': '+' + (x - start.x) + 'px',
-                'left': '+' + (y - start.y) + 'px'
+                // '-webkit-transform': translate,
+                // '-moz-transform': translate,
+                'transform': translate
+                // 'top': top + (x - start.x) + 'px',
+                // 'left': left + (y - start.y) + 'px'
             })
         }).on('touchend mouseup', 'a', function (e) {
-            $(this).removeData('start');
+            $(this).removeData('start').removeClass('active');
         });
+
+        var $lock = $('#lock');
+
+        $lock.on('touchmove mousemove', 'span', function () {
+            var $this = $(this)
+            ,   $active = $packet.find('.active');
+
+            if (! $active.length) return;
+
+            var aid = $active.data('id')
+            ,   lid = $this.data('id');
+
+            $active.css({
+                'transform': 'translate(0, 0)'
+            });
+            // 不匹配
+            if (aid != lid) {
+                return;
+            }
+
+            // 匹配
+            $active.css({
+                'position': 'static'
+            }).appendTo($this.addClass('active'));
+        })
     });
     </script>
 </body>
