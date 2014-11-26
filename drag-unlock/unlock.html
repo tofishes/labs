@@ -152,7 +152,7 @@
 
         $packet.on('touchstart mousedown', packet_item_class, function (e) {
             var $this = $(this)
-            ,   touch = e.originalEvent ? e.originalEvent.touches[0] : e
+            ,   touch = e.originalEvent.touches ? e.originalEvent.touches[0] : e
             ,   startX = touch.pageX
             ,   startY = touch.pageY
 
@@ -175,7 +175,7 @@
 
             if (!$this.hasClass(active) || !start) return;
 
-            var touch = e.originalEvent ? e.originalEvent.touches[0] : e
+            var touch = e.originalEvent.touches ? e.originalEvent.touches[0] : e
 
             ,   x = touch.pageX - start.x
             ,   y = touch.pageY - start.y;
