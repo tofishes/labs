@@ -21,11 +21,15 @@
     #packet a {
         position: absolute;
         top: 2rem;
+    }
+
+    .packet {
+        display: inline-block;
         width: 5rem;
-        height: 7rem;
+        height: 4rem;
         border: 1px solid red;
         text-align: center;
-        line-height: 7em;
+        line-height: 4rem;
     }
 
     #lock {
@@ -36,11 +40,16 @@
         margin: 0 2rem;
         width: 10rem;
         height: 10rem;
+        line-height: 10rem;
+        text-align: center;
         border-radius: 5rem;
         box-shadow: 0 0 0.3rem red;
     }
     #lock > .active {
         box-shadow: 0 0 0.3rem green;
+    }
+    #lock span .correct {
+        margin-left: 0!important;
     }
     </style>
 </head>
@@ -63,7 +72,14 @@
     <script>
     $(function () {
         var data = [1, 2, 3]
-        ,   word = '红包';
+        ,   word = '红包'
+
+        ,   active = 'active'
+
+        ,   $locks = $('#lock span')
+
+        ,   packet_width = packet_height = 50;
+
         function generate() {
             var packets = ''
             ,   _data = data.sort(function () {
@@ -75,27 +91,62 @@
             ,   style;
 
             for (; i < l; i++) {
-                style = 'left: ' +  50 * i + '%; margin-left: -' + 25 * i + 'px'
+                style = 'left: ' +  packet_width * i + '%; margin-left: -' + packet_width / 2 * i + 'px'
 
-                packets += '<a style="' + style + '" data-id="' + _data[i] + '">' + word + '</a>'
+                packets += '<a class="packet" style="' + style + '" data-id="' + _data[i] + '">' + word + '</a>'
             }
 
             return packets;
         };
+        $locks.each(function () {
+            var $this = $(this)
+            ,   offset = $this.offset()
+
+            $this.data('edge', {
+                'x': offset.left,
+                'y': offset.top,
+                'w': $this.width(),
+                'h': $this.height()
+            });
+        });
+        // 如果两个矩形横向坐标相减的绝对值，小于两个矩形各自宽度一半相加的和，
+        // 同时两个矩形纵向坐标相减的绝对值，小于两个矩形各自高度一半相加的和，
+        // 那就说明这两个矩形碰撞了。
+        function reach($move, $target) {
+            var _offset = $move.offset()
+            ,   _x = _offset.left
+            ,   _y = _offset.top
+            ,   _w = _h = packet_width
+
+            ,   edge = $target.data('edge')
+
+            ,   xx = Math.abs(_x - edge.x)
+            ,   yy = Math.abs(_y - edge.y)
+            ,   ww = (_w + edge.w) / 2
+            ,   hh = (_h + edge.h) / 2;
+
+            return xx < ww && yy < hh;
+        }
 
         var $packet = $('#packet');
+
         $packet.html(generate());
 
         $packet.on('touchstart mousedown', 'a', function (e) {
             var $this = $(this)
             ,   touch = e.touches ? e.touches[0] : e
             ,   startX = touch.pageX
-            ,   startY = touch.pageY;
+            ,   startY = touch.pageY
+
+            ,   top = parseInt($this.css('top'))
+            ,   left = parseInt($this.css('left'));
 
             $this.data('start', {
                 'x': startX,
-                'y': startY
-            }).addClass('active');
+                'y': startY,
+                'left': left,
+                'top': top
+            }).addClass(active);
             e.preventDefault();
         }).on('touchmove mousemove', 'a', function (e) {
             e.preventDefault();
@@ -103,52 +154,57 @@
             var $this = $(this)
             ,   start = $this.data('start')
 
-            if (!start) return;
+            if (!$this.hasClass(active) || !start) return;
 
             var touch = e.touches ? e.touches[0] : e
 
             ,   x = touch.pageX - start.x
-            ,   y = touch.pageY - start.y
+            ,   y = touch.pageY - start.y;
 
-            ,   top = $this.css('top')
-            ,   left = $this.css('left');
-
-            var translate = 'translate(' + x + 'px, ' + y + 'px)';
             $this.css({
-                // '-webkit-transform': translate,
-                // '-moz-transform': translate,
-                'transform': translate
-                // 'top': top + (x - start.x) + 'px',
-                // 'left': left + (y - start.y) + 'px'
+                'top': start.top + y,
+                'left': start.left + x
+            });
+
+            // 检测是否进入某个框中
+            $locks.each(function () {
+                var $lock = $(this);
+
+                if (!reach($this, $lock)) return;
+
+                // 如果进入范围，则判断序列号
+                if ($lock.data('id') != $this.data('id')) return;
+
+                $this.removeData('start').removeClass(active).addClass('correct');
+                $lock.addClass(active).append($this);
             })
-        }).on('touchend mouseup', 'a', function (e) {
-            $(this).removeData('start').removeClass('active');
+        })
+        $(document).on('touchend mouseup', function (e) {
+            $packet.find('a').removeData('start').removeClass(active);
         });
 
-        var $lock = $('#lock');
+        // $lock.on('touchmove mousemove', 'span', function () {
+        //     var $this = $(this)
+        //     ,   $active = $packet.find('.active');
 
-        $lock.on('touchmove mousemove', 'span', function () {
-            var $this = $(this)
-            ,   $active = $packet.find('.active');
+        //     if (! $active.length) return;
 
-            if (! $active.length) return;
+        //     var aid = $active.data('id')
+        //     ,   lid = $this.data('id');
 
-            var aid = $active.data('id')
-            ,   lid = $this.data('id');
+        //     $active.css({
+        //         'transform': 'translate(0, 0)'
+        //     });
+        //     // 不匹配
+        //     if (aid != lid) {
+        //         return;
+        //     }
 
-            $active.css({
-                'transform': 'translate(0, 0)'
-            });
-            // 不匹配
-            if (aid != lid) {
-                return;
-            }
-
-            // 匹配
-            $active.css({
-                'position': 'static'
-            }).appendTo($this.addClass('active'));
-        })
+        //     // 匹配
+        //     $active.css({
+        //         'position': 'static'
+        //     }).appendTo($this.addClass(active));
+        // })
     });
     </script>
 </body>
