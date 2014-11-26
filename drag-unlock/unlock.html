@@ -28,6 +28,9 @@
         line-height: 7em;
     }
 
+    #lock {
+        margin: 20rem 0 0;
+    }
     #lock span {
         display: inline-block;
         margin: 0 2rem;
@@ -74,7 +77,7 @@
             for (; i < l; i++) {
                 style = 'left: ' +  50 * i + '%; margin-left: -' + 25 * i + 'px'
 
-                packets += '<a data-id="' + _data[i] + '">' + word + '</a>'
+                packets += '<a style="' + style + '" data-id="' + _data[i] + '">' + word + '</a>'
             }
 
             return packets;
