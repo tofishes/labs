@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>拖动到指定框里解锁</title>
+    <meta content="width=device-width,initial-scale=1, maximum-scale=1, minimum-scale=1,user-scalable=no, minimal-ui" name="viewport" />
+    <meta content="yes" name="apple-mobile-web-app-capable" />
+    <meta content="black" name="apple-mobile-web-app-status-bar-style" />
+    <meta content="telephone=no" name="format-detection" />
+
+    <link rel="stylesheet" href="../libs/css/normalize.css">
+    <style>
+    body {
+        background: #e6e6e6;
+        font-size: 10px;
+    }
+    #wrap {
+        position: relative;
+        margin: 0 2rem;
+    }
+    #packet a {
+        position: absolute;
+        top: 2rem;
+        width: 5rem;
+        height: 7rem;
+        border: 1px solid red;
+        text-align: center;
+        line-height: 7em;
+    }
+
+    #lock span {
+        display: inline-block;
+        margin: 0 2rem;
+        width: 10rem;
+        height: 10rem;
+        border-radius: 5rem;
+        box-shadow: 0 0 0.3rem red;
+    }
+    #lock .active {
+        box-shadow: 0 0 0.3rem green;
+    }
+    </style>
+</head>
+<body>
+    <div id="wrap">
+        <div id="packet">
+            <a data-id="1">红包</a>
+            <a data-id="1">红包</a>
+            <a data-id="1">红包</a>
+        </div>
+
+        <div id="lock">
+            <span data-id="1"></span>
+            <span data-id="2"></span>
+            <span data-id="3"></span>
+        </div>
+    </div>
+
+    <script src="../libs/js/jquery-2.1.1.min.js"></script>
+    <script>
+    $(function () {
+        var data = [1, 2, 3]
+        ,   word = '红包';
+        function generate() {
+            var packets = ''
+            ,   _data = data.sort(function () {
+                return Math.random() - 0.5;
+            })
+            ,   i = 0
+            ,   l = data.length
+
+            ,   style;
+
+            for (; i < l; i++) {
+                style = 'left: ' +  50 * i + '%; margin-left: -' + 25 * i + 'px'
+
+                packets += '<a data-id="' + _data[i] + '">' + word + '</a>'
+            }
+
+            return packets;
+        };
+
+        var $packet = $('#packet');
+        $packet.html(generate());
+
+        $packet.on('touchstart mousedown', 'a', function (e) {
+            var $this = $(this)
+            ,   touch = e.touches ? e.touches[0] : e
+            ,   startX = touch.pageX
+            ,   startY = touce.pageY;
+
+            $this.data('start', {
+                'x': startX,
+                'y': startY
+            });
+            e.preventDefault();
+        }).on('touchmove mousemove', 'a', function (e) {
+            e.preventDefault();
+
+            var $this = $(this)
+            ,   start = $this.data('start')
+            ,   touch = e.touches ? e.touches[0] : e
+
+            ,   x = touch.pageX
+            ,   y = touch.pageY;
+
+            if (!start) return;
+
+            $this.css({
+                'top': '+' + (x - start.x) + 'px',
+                'left': '+' + (y - start.y) + 'px'
+            })
+        }).on('touchend mouseup', 'a', function (e) {
+            $(this).removeData('start');
+        });
+    });
+    </script>
+</body>
+</html>
