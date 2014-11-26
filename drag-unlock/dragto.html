@@ -96,6 +96,7 @@
         ,   active = 'active'
         ,   packet_item_class = opts.item
 
+        ,   $doc = $(document)
         ,   $locks = this
         ,   $status = $('#status')
 
@@ -150,7 +151,9 @@
             return xx < ww && yy < hh;
         }
 
-        var $packet = $('#packet');
+        var $packet = $('#packet')
+
+        ,   $moving = $();
 
         $packet.html(generate());
         // $locks.html(generate());
@@ -171,14 +174,19 @@
                 'top': top
             }).addClass(active);
 
+            $moving = $this;
+
             e.preventDefault();
-        }).on('touchmove mousemove', packet_item_class, function (e) {
+        });
+
+        $doc.on('touchmove mousemove', function (e) {
             e.preventDefault();
 
-            var $this = $(this)
-            ,   start = $this.data('start')
+            var $this = $moving
 
-            if (!$this.hasClass(active) || !start) return;
+            ,   start = $this.data('start');
+
+            if (!$this.length || !start) return;
 
             var touch = e.originalEvent.touches ? e.originalEvent.touches[0] : e
 
@@ -206,7 +214,7 @@
                 }
             });
         })
-        $(document).on('touchend mouseup', function (e) {
+        $doc.on('touchend mouseup', function (e) {
             var $active = $packet.find('.' + active)
             ,   start = $active.data('start');
 
@@ -218,6 +226,8 @@
                 'top': start.top,
                 'left': start.left
             }, 300);
+
+            $moving = $();
         });
     }
 
