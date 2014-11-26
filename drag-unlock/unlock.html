@@ -25,6 +25,7 @@
     #packet a {
         position: absolute;
         top: 3rem;
+        z-index: 2;
     }
 
     .packet {
@@ -37,12 +38,14 @@
     }
 
     #lock {
-        margin: 0 -2.5rem;
+        position: relative;
         padding: 10rem 0 0;
     }
     #lock span {
-        display: inline-block;
-        margin: 0 1.2rem;
+        position: absolute;
+        top: 10rem;
+        left: 50%;
+        margin-left: -2rem;
         width: 4rem;
         height: 4rem;
         line-height: 4rem;
@@ -50,6 +53,14 @@
         border-radius: 2rem;
         box-shadow: 0 0 0.3rem red;
         vertical-align: middle;
+    }
+    #lock span:first-child {
+        left: 0;
+        margin-left: 0;
+    }
+    #lock span:last-child {
+        left: 100%;
+        margin-left: -4rem;
     }
     #lock > .active {
         box-shadow: 0 0 1rem green;
@@ -67,6 +78,7 @@
 </head>
 <body>
     <div class="wrap">
+        <p id="status">拖动红包到正确的篮子中解锁</p>
         <div id="wrap">
             <div id="packet">
                 <a data-id="1">红包</a>
@@ -81,7 +93,6 @@
             </div>
         </div>
 
-        <p id="status">拖动红包到正确的篮子中解锁</p>
     </div>
 
     <script src="../libs/js/jquery-2.1.1.min.js"></script>
